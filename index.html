@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arthur Fit Pro</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+        background-color: #111;
+        color: #f1f1f1;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        padding: 16px;
+      }
+      header {
+        text-align: center;
+        padding: 12px 0;
+        background-color: #1a1a1a;
+        border-bottom: 2px solid #ff2e2e;
+      }
+      h1 {
+        font-size: 1.6rem;
+        color: #ff2e2e;
+        margin: 0;
+      }
+      nav {
+        display: flex;
+        justify-content: space-around;
+        background-color: #1a1a1a;
+        padding: 10px;
+        border-top: 1px solid #222;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+      }
+      nav button {
+        background: none;
+        border: none;
+        color: #ccc;
+        font-size: 0.9rem;
+      }
+      nav button.active {
+        color: #ff2e2e;
+      }
+      section {
+        display: none;
+        flex-grow: 1;
+        margin-bottom: 70px;
+      }
+      section.active {
+        display: block;
+      }
+      .card {
+        background-color: #1e1e1e;
+        padding: 16px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        box-shadow: 0 0 10px rgba(255, 46, 46, 0.2);
+      }
+      input,
+      textarea,
+      select,
+      button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: none;
+        margin-top: 8px;
+        font-size: 1rem;
+      }
+      input,
+      textarea,
+      select {
+        background-color: #2a2a2a;
+        color: #fff;
+      }
+      button {
+        background-color: #ff2e2e;
+        color: #fff;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #e32626;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Arthur Fit Pro</h1>
+    </header>
+
+    <section id="treino" class="active">
+      <div class="card">
+        <h2>Registro de Treino</h2>
+        <input type="text" id="exercicio" placeholder="Exercício" />
+        <input type="number" id="carga" placeholder="Carga (kg)" />
+        <input type="number" id="reps" placeholder="Repetições" />
+        <textarea id="obs" placeholder="Observações"></textarea>
+        <button onclick="salvarTreino()">Salvar</button>
+      </div>
+      <div id="listaTreinos" class="card"></div>
+    </section>
+
+    <section id="alimentacao">
+      <div class="card">
+        <h2>Resumo Diário da Alimentação</h2>
+        <textarea
+          id="resumoAlimentacao"
+          placeholder="Descreva brevemente sua alimentação de hoje..."
+        ></textarea>
+        <button onclick="salvarAlimentacao()">Salvar</button>
+      </div>
+      <div id="listaAlimentacao" class="card"></div>
+    </section>
+
+    <section id="progresso">
+      <div class="card">
+        <h2>Progresso Físico</h2>
+        <input type="number" id="peso" placeholder="Peso (kg)" />
+        <input type="number" id="braco" placeholder="Braço (cm)" />
+        <input type="number" id="peito" placeholder="Peito (cm)" />
+        <input type="number" id="cintura" placeholder="Cintura (cm)" />
+        <input type="number" id="coxa" placeholder="Coxa (cm)" />
+        <button onclick="salvarProgresso()">Salvar</button>
+      </div>
+      <div id="listaProgresso" class="card"></div>
+    </section>
+
+    <nav>
+      <button id="btnTreino" class="active" onclick="mostrar('treino')">
+        Treino
+      </button>
+      <button id="btnAlimentacao" onclick="mostrar('alimentacao')">
+        Alimentação
+      </button>
+      <button id="btnProgresso" onclick="mostrar('progresso')">
+        Progresso
+      </button>
+    </nav>
+
+    <script>
+      const secoes = document.querySelectorAll('section');
+      const botoes = document.querySelectorAll('nav button');
+
+      function mostrar(id) {
+        secoes.forEach(sec => sec.classList.remove('active'));
+        botoes.forEach(btn => btn.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.getElementById('btn' + id.charAt(0).toUpperCase() + id.slice(1)).classList.add('active');
+      }
+
+      function salvarTreino() {
+        const exercicio = document.getElementById('exercicio').value;
+        const carga = document.getElementById('carga').value;
+        const reps = document.getElementById('reps').value;
+        const obs = document.getElementById('obs').value;
+        const treino = { data: new Date().toLocaleDateString(), exercicio, carga, reps, obs };
+        let treinos = JSON.parse(localStorage.getItem('treinos') || '[]');
+        treinos.push(treino);
+        localStorage.setItem('treinos', JSON.stringify(treinos));
+        listarTreinos();
+      }
+
+      function listarTreinos() {
+        const lista = document.getElementById('listaTreinos');
+        lista.innerHTML = '';
+        const treinos = JSON.parse(localStorage.getItem('treinos') || '[]');
+        treinos.forEach(t => {
+          lista.innerHTML += <p><strong>${t.data}</strong> - ${t.exercicio} | ${t.carga}kg x ${t.reps} reps<br>${t.obs}</p>;
+        });
+      }
+
+      function salvarAlimentacao() {
+        const resumo = document.getElementById('resumoAlimentacao').value;
+        const registro = { data: new Date().toLocaleDateString(), resumo };
+        let alimentacao = JSON.parse(localStorage.getItem('alimentacao') || '[]');
+        alimentacao.push(registro);
+        localStorage.setItem('alimentacao', JSON.stringify(alimentacao));
+        listarAlimentacao();
+      }
+
+      function listarAlimentacao() {
+        const lista = document.getElementById('listaAlimentacao');
+        lista.innerHTML = '';
+        const alimentacao = JSON.parse(localStorage.getItem('alimentacao') || '[]');
+        alimentacao.forEach(a => {
+          lista.innerHTML += <p><strong>${a.data}</strong> - ${a.resumo}</p>;
+        });
+      }
+
+      function salvarProgresso() {
+        const peso = document.getElementById('peso').value;
+        const braco = document.getElementById('braco').value;
+        const peito = document.getElementById('peito').value;
+        const cintura = document.getElementById('cintura').value;
+        const coxa = document.getElementById('coxa').value;
+        const progresso = { data: new Date().toLocaleDateString(), peso, braco, peito, cintura, coxa };
+        let progressoList = JSON.parse(localStorage.getItem('progresso') || '[]');
+        progressoList.push(progresso);
+        localStorage.setItem('progresso', JSON.stringify(progressoList));
+        listarProgresso();
+      }
+
+      function listarProgresso() {
+        const lista = document.getElementById('listaProgresso');
+        lista.innerHTML = '';
+        const progresso = JSON.parse(localStorage.getItem('progresso') || '[]');
+        progresso.forEach(p => {
+          lista.innerHTML += <p><strong>${p.data}</strong> - Peso: ${p.peso}kg, Braço: ${p.braco}cm, Peito: ${p.peito}cm, Cintura: ${p.cintura}cm, Coxa: ${p.coxa}cm</p>;
+        });
+      }
+
+      listarTreinos();
+      listarAlimentacao();
+      listarProgresso();
+    </script>
+  </body>
+</html>
